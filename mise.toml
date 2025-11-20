@@ -1,0 +1,49 @@
+[env]
+DBT_PROFILES_DIR="{{ cwd }}"
+UV_NO_MANAGED_PYTHON = true
+
+[tools]
+duckdb = "latest"
+python = "3.13.9"
+uv = "latest"
+
+[settings]
+python.uv_venv_auto = true
+idiomatic_version_file_enable_tools = []
+
+[tasks."data:get"]
+description = "Downloads example data"
+run = "curl https://synthetichealth.github.io/synthea-sample-data/downloads/synthea_sample_data_csv_apr2020.zip -o csv.zip"
+outputs = ["csv.zip"]
+
+[tasks."data:unzip"]
+run = "unzip -o csv.zip"
+description = "Decompresses the data set archive"
+sources = ["csv.zip"]
+outputs = ["csv/"]
+
+[tasks."data:load"]
+description = "Loads CSV data into the database"
+run = """
+#!/usr/bin/env bash
+
+duckdb dev.duckdb -c "create schema if not exists raw;"
+
+for file in csv/*.csv
+do
+    filename=$(basename -- "$file")
+    dataset="${filename%.*}"
+    echo "Loading $dataset"
+    duckdb dev.duckdb -c "create table raw.$dataset as select * from read_csv('$file', all_varchar = true);"
+done
+"""
+sources = ["csv/*.csv"]
+outputs = ["dev.duckdb"]
+
+[tasks.clean]
+sources = ["dev.duckdb", "csv.zip", "csv/", ".venv/"]
+run = '''
+#!/usr/bin/env bash
+
+rm -rf {{ task_source_files() | join(sep=" ") }}
+'''

@@ -1,0 +1,33 @@
+[tasks."data:load"]
+description = "Loads CSV data into the database"
+run_windows = '''
+duckdb dev.duckdb -c "create schema if not exists raw;"
+
+Get-ChildItem -Path "csv/" | ForEach-Object {
+  $dataset = $_.BaseName
+  Write-Host "Loading csv/$($_.Name)"
+  duckdb dev.duckdb -c "create table raw.$($dataset) as select * from read_csv('csv/$($_.Name)', all_varchar = true);"
+}
+'''
+sources = ["csv/*.csv"]
+outputs = ["dev.duckdb"]
+shell = "powershell"
+
+[tasks.clean]
+description = "Cleans up downloaded files and generated directories"
+sources = ["dev.duckdb", "csv.zip", "csv/", ".venv/"]
+run_windows = '''
+{% for file in task_source_files() %}
+  Remove-Item -Path "{{ file }}" -Force -Recurse -ErrorAction SilentlyContinue
+{% endfor %}
+'''
+shell = "powershell"
+
+[tasks."data:unzip"]
+run_windows = '''
+Expand-Archive -Path csv.zip -DestinationPath .
+'''
+description = "Decompresses the data set archive"
+sources = ["csv.zip"]
+outputs = ["csv/"]
+shell = "powershell"
