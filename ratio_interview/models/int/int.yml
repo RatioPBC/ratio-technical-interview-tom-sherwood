@@ -1,0 +1,17 @@
+version: 2
+
+models:
+  - name: encounters_report
+    description: >
+      Report for Stakeholder #1
+    config:
+      schema: reports
+      tags: report
+      materialized: table
+    # columns:
+    #   - name: patient_id
+    #     description: ID for patient
+    #     tests:
+    #       - unique:
+    #           config:
+    #             severity: warn

@@ -1,0 +1,10 @@
+version: 2
+
+sources:
+  - name: synthea
+    # database: ./dev.duckdb
+    schema: raw
+    tables:
+      - name: patients
+      - name: encounters
+      - name: observations

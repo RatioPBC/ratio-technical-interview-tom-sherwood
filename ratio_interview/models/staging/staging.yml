@@ -1,0 +1,47 @@
+version: 2
+
+models:
+  - name: stg_patients
+    description: >
+      Patients table from Synthea sample csvs
+    config:
+      schema: stg
+      tags: stage
+      materialized: table
+    columns:
+      - name: patient_id
+        description: ID for patient
+        tests:
+          - unique:
+              config:
+                severity: warn
+  
+  - name: stg_observations
+    description: >
+      Observations table from Synthea sample csvs
+    config:
+      schema: stg
+      tags: stage
+      materialized: table
+    # columns:
+    #   - name: patient_id
+    #     description: ID for patient
+    #     tests:
+    #       - unique:
+    #           config:
+    #             severity: warn
+  
+  - name: stg_encounters
+    description: >
+      Encounters table from Synthea sample csvs
+    config:
+      schema: stg
+      tags: stage
+      materialized: table
+    columns:
+      - name: encounter_id
+        description: ID for encounter
+        tests:
+          - unique:
+              config:
+                severity: warn

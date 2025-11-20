@@ -1,5 +1,6 @@
 [env]
-DBT_PROFILES_DIR="{{ cwd }}"
+DBT_PROFILES_DIR="{{ config_root }}/ratio_interview"
+DBT_PROJECT_DIR="{{ config_root }}/ratio_interview"
 UV_NO_MANAGED_PYTHON = true
 
 [tools]
